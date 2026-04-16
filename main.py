@@ -324,12 +324,15 @@ def reschedule(appointment_id: int, data: dict):
 
     return {"message": "rescheduled"}
 
-from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home():
-    return FileResponse("index.html")
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
-@app.get("/admin")
+
+@app.get("/admin", response_class=HTMLResponse)
 def admin():
-    return FileResponse("admin.html")
+    with open("admin.html", "r", encoding="utf-8") as f:
+        return f.read()
