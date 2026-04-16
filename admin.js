@@ -1,79 +1,79 @@
-const API = "http://127.0.0.1:8000";
+const API = window.location.origin;
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-    // =========================
-    // 1️⃣ 获取 staff
-    // =========================
-    const staffRes = await fetch(`${API}/staff/`);
-    const staffData = await staffRes.json();
-
-    const resources = staffData.map(s => ({
-        id: s.id,
-        title: s.name
-    }));
-
-    // =========================
-    // 2️⃣ 获取 appointments
-    // =========================
-    const res = await fetch(`${API}/appointments/`);
-    const data = await res.json();
-
-    const events = data.map(a => ({
-        id: a.id,
-        title: `${a.name} - ${a.service}`,
-        start: `${a.date}T${a.time}`,
-        resourceId: a.staff_id,   // 🔥关键：分配到员工列
-        backgroundColor:
-            a.status === "completed" ? "green" :
-            a.status === "cancelled" ? "red" : "orange"
-    }));
-
-    // =========================
-    // 3️⃣ 初始化 FullCalendar
-    // =========================
     const calendarEl = document.getElementById("calendar");
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
 
-        initialView: "resourceTimeGridDay",
-
-        resources: resources,   // 👈 staff列
+        initialView: "timeGridDay",
+        height: 650,
 
         headerToolbar: {
             left: "prev,next today",
             center: "title",
-            right: "resourceTimeGridDay,resourceTimeGridWeek"
+            right: "timeGridDay,timeGridWeek"
         },
 
-        editable: true,   // 🔥可拖拽
-
-        events: events,
+        editable: true,
 
         // =========================
-        // 4️⃣ 拖拽更新
+        // 🔥 动态加载 events（关键）
+        // =========================
+        events: async function(fetchInfo, successCallback, failureCallback) {
+            try {
+                const res = await fetch(`${API}/appointments/`);
+                const data = await res.json();
+
+                const events = data.map(a => ({
+                    id: a.id,
+                    title: `${a.name} - ${a.service}`,
+                    start: `${a.date}T${a.time}`,
+                    backgroundColor:
+                        a.status === "completed" ? "green" :
+                        a.status === "cancelled" ? "red" : "orange"
+                }));
+
+                successCallback(events);
+
+            } catch (err) {
+                console.error(err);
+                failureCallback(err);
+            }
+        },
+
+        // =========================
+        // 🔥 拖拽更新时间
         // =========================
         eventDrop: async function(info) {
 
-            const newDate = info.event.start.toISOString().split("T")[0];
-            const newTime = info.event.start.toTimeString().slice(0,5);
-            const newStaff = info.event.getResources()[0]?.id;
+            const id = info.event.id;
 
-            await fetch(`${API}/appointments/${info.event.id}/reschedule`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    date: newDate,
-                    time: newTime,
-                    staff_id: newStaff
-                })
-            });
+            const newDate = info.event.startStr.slice(0, 10);
+            const newTime = info.event.startStr.slice(11, 16);
 
-            alert("Updated ✔");
+            try {
+                await fetch(`${API}/appointments/${id}/reschedule`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        date: newDate,
+                        time: newTime,
+                        staff_id: 1   // 先固定
+                    })
+                });
+
+                alert("Updated ✔");
+
+            } catch (err) {
+                alert("Update failed ❌");
+                console.error(err);
+            }
         }
+
     });
 
     calendar.render();
-});
+}); 
