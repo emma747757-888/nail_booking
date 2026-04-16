@@ -3,12 +3,12 @@ import sqlite3
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime, timedelta
-from fastapi.staticfiles import StaticFiles   # ✅ 一定要有这行
+from fastapi.staticfiles import StaticFiles  
 
 app = FastAPI()
 
 # 静态文件
-app.mount("/static", StaticFiles(directory="."), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # =========================
 # CORS
