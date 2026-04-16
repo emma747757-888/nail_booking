@@ -1,3 +1,4 @@
+alert("JS LOADED");
 console.log("ADMIN JS LOADED ✔");
 
 window.onload = function () {
