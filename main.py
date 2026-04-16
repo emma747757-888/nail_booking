@@ -323,3 +323,13 @@ def reschedule(appointment_id: int, data: dict):
     conn.close()
 
     return {"message": "rescheduled"}
+
+from fastapi.responses import FileResponse
+
+@app.get("/")
+def home():
+    return FileResponse("index.html")
+
+@app.get("/admin")
+def admin():
+    return FileResponse("admin.html")
