@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:8000";
+const API = window.location.origin;
 
 // =========================
 // 1️⃣ 加载服务
@@ -56,6 +56,7 @@ async function loadSlots() {
     data.available_slots.forEach(time => {
         const btn = document.createElement("button");
         btn.innerText = time;
+	btn.className = "btn btn-outline-dark m-1";
 
         btn.onclick = () => {
             document.getElementById("time").value = time;

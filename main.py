@@ -3,12 +3,18 @@ import sqlite3
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime, timedelta
+from fastapi.staticfiles import StaticFiles   # ✅ 一定要有这行
 
 app = FastAPI()
+
+# 静态文件
+app.mount("/static", StaticFiles(directory="."), name="static")
 
 # =========================
 # CORS
 # =========================
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,7 +22,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # =========================
 # MODELS
 # =========================
