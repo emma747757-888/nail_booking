@@ -1,3 +1,5 @@
+console.log("ADMIN JS LOADED ✔");
+console.log(document.getElementById("calendar"));
 const API = window.location.origin;
 
 document.addEventListener("DOMContentLoaded", function () {
