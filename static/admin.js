@@ -1,10 +1,10 @@
 console.log("ADMIN JS LOADED ✔");
-console.log(document.getElementById("calendar"));
-const API = window.location.origin;
 
-document.addEventListener("DOMContentLoaded", function () {
+window.onload = function () {
 
     const calendarEl = document.getElementById("calendar");
+
+    console.log("calendarEl:", calendarEl);
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
 
@@ -19,63 +19,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
         editable: true,
 
-        // =========================
-        // 🔥 动态加载 events（关键）
-        // =========================
-        events: async function(fetchInfo, successCallback, failureCallback) {
-            try {
-                const res = await fetch(`${API}/appointments/`);
-                const data = await res.json();
+        events: async function(fetchInfo, successCallback) {
 
-                const events = data.map(a => ({
-                    id: a.id,
-                    title: `${a.name} - ${a.service}`,
-                    start: `${a.date}T${a.time}`,
-                    backgroundColor:
-                        a.status === "completed" ? "green" :
-                        a.status === "cancelled" ? "red" : "orange"
-                }));
+            const res = await fetch(`${API}/appointments/`);
+            const data = await res.json();
 
-                successCallback(events);
+            console.log("appointments:", data);
 
-            } catch (err) {
-                console.error(err);
-                failureCallback(err);
-            }
-        },
+            const events = data.map(a => ({
+                id: a.id,
+                title: `${a.name} - ${a.service}`,
+                start: `${a.date}T${a.time}`
+            }));
 
-        // =========================
-        // 🔥 拖拽更新时间
-        // =========================
-        eventDrop: async function(info) {
-
-            const id = info.event.id;
-
-            const newDate = info.event.startStr.slice(0, 10);
-            const newTime = info.event.startStr.slice(11, 16);
-
-            try {
-                await fetch(`${API}/appointments/${id}/reschedule`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        date: newDate,
-                        time: newTime,
-                        staff_id: 1   // 先固定
-                    })
-                });
-
-                alert("Updated ✔");
-
-            } catch (err) {
-                alert("Update failed ❌");
-                console.error(err);
-            }
+            successCallback(events);
         }
-
     });
 
     calendar.render();
-}); 
+};
