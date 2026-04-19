@@ -3,31 +3,37 @@ import sqlite3
 conn = sqlite3.connect("nail_booking.db")
 cursor = conn.cursor()
 
-cursor.execute("""
+cursor.executescript("""
 CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
-    phone TEXT,
-    visit_count INTEGER DEFAULT 0
-)
-""")
+    phone TEXT
+);
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS appointments (
+CREATE TABLE IF NOT EXISTS staff (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
-    phone TEXT,
+    active INTEGER DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    duration INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS appointments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER,
+    staff_id INTEGER,
+    service_id INTEGER,
     date TEXT,
     time TEXT,
-    service TEXT,
-    status TEXT,
-    rating TEXT,
-    comment TEXT,
-    visit_count INTEGER DEFAULT 0
-)
+    status TEXT DEFAULT 'scheduled'
+);
 """)
 
 conn.commit()
 conn.close()
 
-print("DB ready")
+print("DB initialized ✔")

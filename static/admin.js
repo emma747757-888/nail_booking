@@ -1,6 +1,6 @@
-console.log("ADMIN JS LOADED");
+console.log("ADMIN JS LOADED ✔");
 
-window.addEventListener("load", function () {
+window.addEventListener("load", async function () {
 
     console.log("FullCalendar =", typeof FullCalendar);
 
@@ -12,12 +12,30 @@ window.addEventListener("load", function () {
     }
 
     if (typeof FullCalendar === "undefined") {
-        console.error("FullCalendar NOT LOADED ❌");
+        console.error("FullCalendar not loaded");
         return;
     }
 
     const calendar = new FullCalendar.Calendar(el, {
-        initialView: "dayGridMonth"
+
+        initialView: "timeGridDay",
+        height: 650,
+
+        headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: "timeGridDay,timeGridWeek"
+        },
+
+        events: async function(fetchInfo, successCallback) {
+
+            const res = await fetch("/api/calendar");
+            const data = await res.json();
+
+            console.log("events:", data);
+
+            successCallback(data);
+        }
     });
 
     calendar.render();
