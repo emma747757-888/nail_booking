@@ -336,6 +336,8 @@ def home():
     return FileResponse("index.html")
 
 
-@app.get("/admin")
+from fastapi.responses import HTMLResponse
+
+@app.get("/admin", response_class=HTMLResponse)
 def admin():
-    return FileResponse("admin.html")
+    return "<h1>HELLO TEST</h1>"
