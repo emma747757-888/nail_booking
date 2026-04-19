@@ -1,55 +1,26 @@
 console.log("ADMIN JS LOADED");
 
-const API = window.location.origin;
+window.addEventListener("load", function () {
 
-function initCalendar() {
+    console.log("FullCalendar =", typeof FullCalendar);
 
-    const calendarEl = document.getElementById("calendar");
+    const el = document.getElementById("calendar");
 
-    if (!calendarEl) {
+    if (!el) {
         console.error("calendar not found");
         return;
     }
 
-    if (!window.FullCalendar) {
-        console.error("FullCalendar not loaded yet");
+    if (typeof FullCalendar === "undefined") {
+        console.error("FullCalendar NOT LOADED ❌");
         return;
     }
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "timeGridDay",
-        height: 650,
-
-        headerToolbar: {
-            left: "prev,next today",
-            center: "title",
-            right: "timeGridDay,timeGridWeek"
-        },
-
-        events: async function (info, successCallback) {
-
-            const res = await fetch(`${API}/appointments/`);
-            const data = await res.json();
-
-            const events = data.map(a => ({
-                id: a.id,
-                title: `${a.name} - ${a.service}`,
-                start: `${a.date}T${a.time}`
-            }));
-
-            successCallback(events);
-        }
+    const calendar = new FullCalendar.Calendar(el, {
+        initialView: "dayGridMonth"
     });
 
     calendar.render();
 
-    console.log("calendar rendered");
-}
-
-// 🔥 等 FullCalendar 真加载出来
-const wait = setInterval(() => {
-    if (window.FullCalendar) {
-        clearInterval(wait);
-        initCalendar();
-    }
-}, 50);
+    console.log("calendar rendered ✔");
+});
