@@ -1,12 +1,22 @@
-alert("JS LOADED");
+console.log("ADMIN JS LOADED");
 
-const API = window.location.origin;  // ✅ 必须加
+const API = window.location.origin;
 
-window.onload = function () {
+window.addEventListener("load", function () {
+
+    console.log("FullCalendar =", typeof FullCalendar);
 
     const calendarEl = document.getElementById("calendar");
 
-    console.log("calendarEl:", calendarEl);
+    if (!calendarEl) {
+        console.error("❌ calendar div not found");
+        return;
+    }
+
+    if (typeof FullCalendar === "undefined") {
+        console.error("❌ FullCalendar not loaded (CDN issue)");
+        return;
+    }
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
 
@@ -21,22 +31,32 @@ window.onload = function () {
 
         editable: true,
 
+        // =========================
+        // 🔥 events 保持你的逻辑
+        // =========================
         events: async function(fetchInfo, successCallback) {
 
-            const res = await fetch(`${API}/appointments/`);
-            const data = await res.json();
+            try {
+                const res = await fetch(`${API}/appointments/`);
+                const data = await res.json();
 
-            console.log("appointments:", data);
+                console.log("appointments:", data);
 
-            const events = data.map(a => ({
-                id: a.id,
-                title: `${a.name} - ${a.service}`,
-                start: `${a.date}T${a.time}`
-            }));
+                const events = data.map(a => ({
+                    id: a.id,
+                    title: `${a.name} - ${a.service}`,
+                    start: `${a.date}T${a.time}`
+                }));
 
-            successCallback(events);
+                successCallback(events);
+
+            } catch (err) {
+                console.error("❌ fetch error:", err);
+            }
         }
     });
 
     calendar.render();
-};
+
+    console.log("✅ calendar rendered");
+});
