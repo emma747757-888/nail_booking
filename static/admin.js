@@ -1,5 +1,6 @@
 alert("JS LOADED");
-console.log("ADMIN JS LOADED ✔");
+
+const API = window.location.origin;  // ✅ 必须加
 
 window.onload = function () {
 
