@@ -1,25 +1,22 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import sqlite3
 import os
+import sqlite3
 
 app = FastAPI()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # =====================
-# STATIC + TEMPLATE
+# STATIC FILES
 # =====================
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# =====================
+# JINJA TEMPLATE SETUP
+# =====================
 templates = Jinja2Templates(directory="templates")
-
-
-# =====================
-# DB
-# =====================
-def get_conn():
-    return sqlite3.connect("nail_booking.db")
 
 
 # =====================
@@ -27,20 +24,24 @@ def get_conn():
 # =====================
 @app.get("/")
 def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {
+        "request": request
+    })
 
 
 @app.get("/admin")
 def admin(request: Request):
-    return templates.TemplateResponse("admin.html", {"request": request})
+    return templates.TemplateResponse("admin.html", {
+        "request": request
+    })
 
 
 # =====================
-# CALENDAR API (核心)
+# CALENDAR API
 # =====================
 @app.get("/api/calendar")
 def calendar():
-    conn = get_conn()
+    conn = sqlite3.connect(os.path.join(BASE_DIR, "nail_booking.db"))
     cursor = conn.cursor()
 
     cursor.execute("""

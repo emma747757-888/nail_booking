@@ -2,8 +2,6 @@ console.log("ADMIN JS LOADED ✔");
 
 window.addEventListener("load", async function () {
 
-    console.log("FullCalendar =", typeof FullCalendar);
-
     const el = document.getElementById("calendar");
 
     if (!el) {
@@ -31,8 +29,6 @@ window.addEventListener("load", async function () {
 
             const res = await fetch("/api/calendar");
             const data = await res.json();
-
-            console.log("events:", data);
 
             successCallback(data);
         }
